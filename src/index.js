@@ -40,12 +40,7 @@ for (const serverConfig of config.servers) {
 
   server.on("connection", client => {
     client.server = server;
-    if (manager.status == "OFFLINE" && !serverConfig.whitelist) {
-      console.log(
-        "Got a connection, but we're offline... spinning up the server early"
-      );
-      manager.startup();
-    }
+    console.log("Server got a connection");
   });
 
   function hotLobby(client) {
@@ -75,13 +70,14 @@ for (const serverConfig of config.servers) {
         )
       ]);
     }
+
     client.write("map_chunk", {
       x: 0,
       z: 0,
       groundUp: false,
       bitMap: 0xffff,
       heightmaps: {
-        name: "heightmaps",
+        name: "",
         type: "compound",
         value: {
           MOTION_BLOCKING: {
@@ -96,27 +92,44 @@ for (const serverConfig of config.servers) {
 
     client.write("position", {
       x: 15,
-      y: 101,
+      y: 4,
       z: 15,
       yaw: 137,
       pitch: 0,
+      onGround: true,
       flags: 0x00
+    });
+
+    client.write("update_view_position", {
+      chunkX: 0,
+      chunkZ: 0
     });
   }
 
   manager.on("online", () => {
     for (const clientId in server.clients) {
       const client = server.clients[clientId];
-      const proxy = manager.createProxy(client);
-      proxy.once("login", data => {
-        manager.entities.associate(data.entityId, client.entityId);
-        client.write("respawn", {
-          dimension: data.dimension,
-          gamemode: data.gameMode,
-          levelType: data.levelType,
-          hashedSeed: data.hashedSeed
+      if (client.username) {
+        const proxy = manager.createProxy(client);
+        proxy.once("login", data => {
+          manager.entities.associate(data.entityId, client.entityId);
+          client.write("respawn", {
+            dimension: data.dimension,
+            gamemode: data.gameMode,
+            levelType: data.levelType,
+            hashedSeed: data.hashedSeed
+          });
         });
-      });
+      }
+    }
+  });
+  manager.on("offline", () => {
+    for (const clientId in server.clients) {
+      const client = server.clients[clientId];
+      if (client.username) {
+        hotLobby(client);
+        createLobby(client);
+      }
     }
   });
 
@@ -124,17 +137,17 @@ for (const serverConfig of config.servers) {
     console.log(
       `New login from ${client.uuid}. Manager is currently ${manager.status}`
     );
-    if (serverConfig.whitelist) {
-      if (!serverConfig.whitelist[client.uuid]) {
-        client.end("You are not whitelisted");
-        console.log(`Kicked ${client.uuid} for not being in whitelist`);
-        return;
-      }
+    if (serverConfig.whitelist && !serverConfig.whitelist[client.uuid]) {
+      client.end("You are not whitelisted");
+      console.log(`Kicked ${client.uuid} for not being in whitelist`);
+      return;
+    }
 
-      if (manager.status == "OFFLINE") {
-        console.log("Manager says we're offline, spinning it up!");
-        manager.startup();
-      }
+    manager.unqueueShutdown();
+
+    if (manager.status == "OFFLINE") {
+      console.log("Manager says we're offline, spinning it up!");
+      manager.startup();
     }
 
     const entityId = manager.entities.id();
@@ -171,6 +184,11 @@ for (const serverConfig of config.servers) {
     }
 
     client.on("end", reason => {
+      if (server.playerCount == 0) {
+        console.log("No more players left... Starting a shutdown request");
+        manager.queueShutdown();
+      }
+
       console.log("End...", reason);
     });
   });

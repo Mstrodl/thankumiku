@@ -15,7 +15,8 @@ module.exports = {
         process: {
           cwd: "/home/mary/projects/minecraft",
           executable: "/usr/bin/java",
-          args: ["-jar", "paper-62.jar"]
+          args: ["-jar", "paper-62.jar"],
+          shutdownTime: 1000 * 60 * 2
         }
       }
     }
