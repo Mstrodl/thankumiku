@@ -51,6 +51,7 @@ class Manager extends EventEmitter {
   }
   unqueueShutdown() {
     if (this._shutdownTimeout) {
+      console.log("Unqueue-ing shutdown");
       clearTimeout(this._shutdownTimeout);
       this._shutdownTimeout = null;
     }
@@ -93,13 +94,13 @@ class Manager extends EventEmitter {
         )
       ) {
         console.log(
-          "Server is ready... Waiting 30s for the server to tick a bit"
+          "Server is ready... Waiting 10s for the server to tick a bit"
         );
         setTimeout(() => {
           console.log("Started server");
           this.status = "ONLINE";
           this.emit("online");
-        }, 1000 * 30);
+        }, 1000 * 10);
       }
     });
 
