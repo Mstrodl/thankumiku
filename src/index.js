@@ -45,7 +45,14 @@ for (const serverConfig of config.servers) {
 
   function hotLobby(client) {
     client.write("respawn", {
-      dimension: 1 - Math.pow(2, 31),
+      dimension: -1,
+      gamemode: 0,
+      levelType: "normal",
+      hashedSeed: [0, 0]
+    });
+
+    client.write("respawn", {
+      dimension: 0,
       hashedSeed: [0, 0],
       gameMode: 2,
       levelType: "normal"
@@ -114,6 +121,12 @@ for (const serverConfig of config.servers) {
         proxy.once("login", data => {
           manager.entities.associate(data.entityId, client.entityId);
           client.write("respawn", {
+            dimension: -1,
+            gamemode: data.gameMode,
+            levelType: data.levelType,
+            hashedSeed: data.hashedSeed
+          });
+          client.write("respawn", {
             dimension: data.dimension,
             gamemode: data.gameMode,
             levelType: data.levelType,
@@ -156,23 +169,28 @@ for (const serverConfig of config.servers) {
     if (manager.status != "ONLINE") {
       console.log("Manager isn't ready yet, bringing up the lobby");
 
-      client.write("login", {
+      const data = {
         entityId,
         levelType: "default",
         gameMode: 2,
         dimension: 0,
-        difficulty: 2,
+        viewDistance: 10,
         maxPlayers: server.maxPlayers,
         reducedDebugInfo: false,
         enableRespawnScreen: true,
         hashedSeed: [0, 0]
-      });
+      };
+
+      console.log("Lobby login", data);
+
+      client.write("login", data);
 
       createLobby(client);
     } else {
       const proxy = manager.createProxy(client);
       proxy.once("login", data => {
         manager.entities.associate(data.entityId, client.entityId);
+        console.log("Login packet...", data);
         client.write(
           "login",
           Object.assign({}, data, {

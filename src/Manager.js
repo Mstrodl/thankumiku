@@ -92,13 +92,18 @@ class Manager extends EventEmitter {
           /^\[(?:\d{2}\:){2}\d{2} INFO\]: Done \(\d+.\d+s\)! For help, type "help"\n$/
         )
       ) {
-        console.log("Started server");
-        this.status = "ONLINE";
-        this.emit("online");
+        console.log(
+          "Server is ready... Waiting 30s for the server to tick a bit"
+        );
+        setTimeout(() => {
+          console.log("Started server");
+          this.status = "ONLINE";
+          this.emit("online");
+        }, 1000 * 30);
       }
     });
 
-    this.process.once("end", code => {
+    this.process.once("exit", code => {
       console.log("Server shut down... Code: " + code);
       this.process = null;
       if (this.status != "OFFLINE") {
@@ -130,7 +135,11 @@ class Manager extends EventEmitter {
     proxy.on("packet", (data, metadata) => {
       if (metadata.name == "login" || metadata.state != "play") return;
 
-      if (!NO_LOGS.includes(metadata.name)) {
+      if (
+        metadata.name == "respawn" ||
+        (!NO_LOGS.includes(metadata.name) &&
+          process.env.NODE_ENV != "production")
+      ) {
         console.log("Sending to client...", metadata, data);
       }
 
@@ -143,7 +152,9 @@ class Manager extends EventEmitter {
       if (metadata.name == "keep_alive" || metadata.state != "play") {
         return console.log("Dropping bad", metadata);
       }
-      console.log("Sending to proxy...", metadata, data);
+      if (process.env.NODE_ENV != "production") {
+        console.log("Sending to proxy...", metadata, data);
+      }
 
       if (this.entityClobber(metadata, data, true) === null) return;
 
