@@ -14,7 +14,9 @@ for (const serverConfig of config.servers) {
   const manager = new Manager(serverConfig.backend);
 
   const chunks = {};
-  const chunkList = fs.readdirSync(serverConfig.proxy.lobbyChunks);
+  const chunkList = serverConfig.proxy.lobbyChunks
+    ? fs.readdirSync(serverConfig.proxy.lobbyChunks)
+    : [];
   for (const chunk of chunkList) {
     if (!chunk.endsWith(".bin")) {
       continue;
