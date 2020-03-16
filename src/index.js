@@ -103,7 +103,7 @@ for (const serverConfig of config.servers) {
           }
         }
       },
-      chunkData: chunks[0] && chunks[0][0],
+      chunkData: chunks[0][0],
       blockEntities: []
     });
 
