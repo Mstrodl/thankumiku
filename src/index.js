@@ -113,6 +113,16 @@ for (const serverConfig of config.servers) {
       chunkX: 0,
       chunkZ: 0
     });
+
+    client.write("chat", {
+      message: JSON.stringify({
+        translate: "chat.type.text",
+        with: [
+          "Server",
+          "The server isn't ready, please wait in this endless void..."
+        ]
+      })
+    });
   }
 
   manager.on("online", () => {

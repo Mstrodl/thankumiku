@@ -3,6 +3,8 @@ const child_process = require("child_process");
 const NMP = require("minecraft-protocol");
 const IDMap = require("./IDMap");
 
+const debug = require("debug")("ProcessManager");
+
 const ENTITY_PROPS = [
   "entityId",
   "collectedEntityId",
@@ -86,8 +88,8 @@ class Manager extends EventEmitter {
     this.status = "STARTING";
     this.emit("starting");
     console.log("Starting server");
+    this.process.stdout.pipe(process.stdout);
     this.process.stdout.on("data", msg => {
-      console.log("Msg", msg);
       if (
         msg.match(
           /^\[(?:\d{2}\:){2}\d{2} INFO\]: Done \(\d+.\d+s\)! For help, type "help"\n$/
@@ -103,6 +105,7 @@ class Manager extends EventEmitter {
         }, 1000 * 10);
       }
     });
+    process.stdin.pipe(this.process.stdin);
 
     this.process.once("exit", code => {
       console.log("Server shut down... Code: " + code);
@@ -141,7 +144,7 @@ class Manager extends EventEmitter {
         (!NO_LOGS.includes(metadata.name) &&
           process.env.NODE_ENV != "production")
       ) {
-        console.log("Sending to client...", metadata, data);
+        debug("Sending to client...", metadata, data);
       }
 
       this.entityClobber(metadata, data);
@@ -151,10 +154,10 @@ class Manager extends EventEmitter {
 
     const proxyFromClient = (data, metadata) => {
       if (metadata.name == "keep_alive" || metadata.state != "play") {
-        return console.log("Dropping bad", metadata);
+        return debug("Dropping bad", metadata);
       }
       if (process.env.NODE_ENV != "production") {
-        console.log("Sending to proxy...", metadata, data);
+        debug("Sending to proxy...", metadata, data);
       }
 
       if (this.entityClobber(metadata, data, true) === null) return;
@@ -178,7 +181,7 @@ class Manager extends EventEmitter {
         if (toServer) {
           tag.entries = tag.entries.filter(val => val);
           if (!tag.entries.length) {
-            console.log("Tag has no entries. Dropping");
+            console.warn("Tag has no entries. Dropping");
             data.entityTags[tagIndex] = null;
           }
         }
@@ -197,7 +200,7 @@ class Manager extends EventEmitter {
           ? this.entities.fromClientId(data[id])
           : this.entities.fromProxyId(data[id]);
         if (!data[id]) {
-          console.log("Concerning... No entity id, dropping...");
+          console.warn("Concerning... No entity id, dropping...");
           return null;
         }
       }
@@ -210,14 +213,14 @@ class Manager extends EventEmitter {
             ? this.entities.fromClientId(data[id][index])
             : this.entities.fromProxyId(data[id][index]);
           if (!data[id][index]) {
-            console.log("Concerning... No entity id in arr, dropping...");
+            console.warn("Concerning... No entity id in arr, dropping...");
             return null;
           }
         }
         if (toServer) {
           data[id] = data[id].filter(val => val);
           if (!data[id].length) {
-            console.log(
+            console.warn(
               "Concerning... No entity id AT ALL in arr, dropping..."
             );
             return null;
