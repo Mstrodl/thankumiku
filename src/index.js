@@ -4,6 +4,8 @@ const Manager = require("./Manager");
 const fs = require("fs");
 
 for (const serverConfig of config.servers) {
+  const startTime = Date.now();
+
   const server = NMP.createServer({
     motd: serverConfig.proxy.motd,
     maxPlayers: serverConfig.proxy.maxPlayers,
@@ -38,7 +40,13 @@ for (const serverConfig of config.servers) {
       };
     }
   }
-  console.log("Loaded chunks into memory");
+  console.log("Loaded chunks into memory.. Now for pterodactyl");
+
+  console.log(
+    `[${new Date().toString().slice(16, 24)} INFO\]: Done \(${Math.round(
+      (Date.now() - startTime) / 10
+    ) / 100}s\)! For help, type "help"`
+  );
 
   server.on("connection", client => {
     client.server = server;
@@ -95,7 +103,7 @@ for (const serverConfig of config.servers) {
           }
         }
       },
-      chunkData: chunks[0][0],
+      chunkData: chunks[0] && chunks[0][0],
       blockEntities: []
     });
 
