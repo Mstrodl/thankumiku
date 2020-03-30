@@ -32,6 +32,7 @@ class Manager extends EventEmitter {
     this.cwd = options.process.cwd;
     this.executable = options.process.executable;
     this.args = options.process.args;
+    this.ipForwarding = options.ipForwarding;
 
     this.entities = new IDMap();
 
@@ -102,7 +103,7 @@ class Manager extends EventEmitter {
           console.log("Started server");
           this.status = "ONLINE";
           this.emit("online");
-        }, 1000 * 10);
+        }, 1000 * 0);
       }
     });
     process.stdin.pipe(this.process.stdin);
@@ -119,11 +120,20 @@ class Manager extends EventEmitter {
   }
 
   createProxy(client) {
+    let tagHost = "";
+    if (this.ipForwarding) {
+      tagHost += `\0${client.socket.remoteAddress}\0${client.uuid}`;
+      if (client.profile)
+        tagHost += "\0" + JSON.stringify(client.profile.properties);
+    }
+
     const proxy = NMP.createClient({
       host: this.address,
       port: this.port,
       username: client.username,
-      version: client.server.version
+      version: client.server.version,
+      // https://github.com/SpigotMC/BungeeCord/blob/f1c32f84f46589632d7721d8de87d5589ef8e6a6/proxy/src/main/java/net/md_5/bungee/ServerConnector.java#L103
+      tagHost
     });
 
     client.once("end", reason => proxy.end(reason));
