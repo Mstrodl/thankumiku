@@ -301,10 +301,6 @@ class Manager extends EventEmitter {
     ];
 
     const execName = "criu";
-    // We're running off a dump.. enter the namespace first!
-    // if (previous) {
-    //   args.push("--real-pid=" + this.pid);
-    // }
 
     const proc = child_process.execFile(execName, args, {
       cwd: this.cwd,
@@ -463,10 +459,6 @@ class Manager extends EventEmitter {
 
     console.log("Packet from poxy?");
     proxy.on("packet", (data, metadata) => {
-      // console.log("Packet from poxy", data, metadata);
-      if (metadata.name == "login") {
-        this.__TMP_entityId = data.entityId;
-      }
       if (metadata.name == "login" || metadata.state != "play") {
         return;
       }
