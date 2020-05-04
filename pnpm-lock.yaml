@@ -1,6 +1,10 @@
 dependencies:
   debug: 4.1.1
-  minecraft-protocol: 1.11.0
+  minecraft-protocol: github.com/mstrodl/node-minecraft-protocol/390526187abcd8895a324bf1533903e06e89686c
+  minecraft-protocol-forge: github.com/prismarinejs/node-minecraft-protocol-forge/b8eda1a6c5e006038cfcc1c808c3691b3c852141
+  node-pty: 0.9.0
+  protodef: 1.6.10
+  tail: 2.0.3
 devDependencies:
   pkg: 4.4.4
 lockfileVersion: 5.1
@@ -52,8 +56,18 @@ packages:
       fast-json-stable-stringify: 2.1.0
       json-schema-traverse: 0.4.1
       uri-js: 4.2.2
+    dev: true
     resolution:
       integrity: sha512-D6gFiFA0RRLyUbvijN74DWAjXSFxWKaWP7mldxkVhyhAV3+SWA9HEJPHQ2c9soIeTFJqcSdFDGFgdqs1iUU2Hw==
+  /ajv/6.12.2:
+    dependencies:
+      fast-deep-equal: 3.1.1
+      fast-json-stable-stringify: 2.1.0
+      json-schema-traverse: 0.4.1
+      uri-js: 4.2.2
+    dev: false
+    resolution:
+      integrity: sha512-k+V+hzjm5q/Mr8ef/1Y9goCmlsK4I6Sm74teeyGvFk1XrOsbsKLjEdrvny42CZ+a8sXbk8KWpY/bDwS+FLL2UQ==
   /ansi-styles/4.2.1:
     dependencies:
       '@types/color-name': 1.1.1
@@ -523,29 +537,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-01paPWYgLrkqAyrlDorC1uDwl2p3qZT7yl806vW7DvDoxwXi46jsjFbg+WdwotBIk6/MbEhO/dh5aZ5sNj/dWQ==
-  /minecraft-data/2.42.0:
+  /minecraft-data/2.49.0:
     dev: false
     resolution:
-      integrity: sha512-4uXdUDnmkSSmbhHiFTbeQv59i4+D4NVBWVMm8Mp6YBdeN0GqOeAItnVlrFDofsTukWd+vrcGXA1qCRyEb52ThQ==
-  /minecraft-protocol/1.11.0:
-    dependencies:
-      buffer-equal: 1.0.0
-      debug: 4.1.1
-      endian-toggle: 0.0.0
-      lodash.get: 4.4.2
-      lodash.merge: 4.6.2
-      minecraft-data: 2.42.0
-      node-rsa: 0.4.2
-      prismarine-nbt: 1.2.1
-      protodef: 1.6.10
-      readable-stream: 3.6.0
-      uuid-1345: 0.99.7
-      yggdrasil: 1.3.0
-    dev: false
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-elISYzntPx/RWgRXuqv3A84JtOw+JKpL/8GT6kJbZhHeztgfL0mRAkvSOgT0PoGkBS+h09pfVmRS4zvU7i+jxw==
+      integrity: sha512-R/G73AB4v9aQPsrvQifbg5LSPF2PhBrSpWWo7orKnfQtEAH28VWkpuZ7f+MGmwINGDMm6Ce1lW9tNPfW/h4iMw==
   /minimist/1.2.5:
     dev: true
     resolution:
@@ -569,6 +564,17 @@ packages:
     dev: true
     resolution:
       integrity: sha512-xasv76hl6nr1dEy3lPvy7Ej7K/Lx3O/FCvwge8PeVJpciPPoNCbaANcNiBug3IpdvTveZUcAV0DJzdnUDMesNQ==
+  /nan/2.14.1:
+    dev: false
+    resolution:
+      integrity: sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
+  /node-pty/0.9.0:
+    dependencies:
+      nan: 2.14.1
+    dev: false
+    requiresBuild: true
+    resolution:
+      integrity: sha512-MBnCQl83FTYOu7B4xWw10AW77AAh7ThCE1VXEv+JeWj8mSpGo+0bwgsV+b23ljBFwEM9OmsOv3kM27iUPPm84g==
   /node-rsa/0.4.2:
     dependencies:
       asn1: 0.2.3
@@ -692,7 +698,7 @@ packages:
       integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
   /protodef-validator/1.2.3:
     dependencies:
-      ajv: 6.12.0
+      ajv: 6.12.2
     dev: false
     hasBin: true
     resolution:
@@ -872,6 +878,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-oRSIpR8pxT1Wr2FquTNnGet79b3BWljqOuoW/h4oBhxJ/HUbX5nX6JSruTkvXDCFMwDPvsaTTbvMLKZWSy0R5g==
+  /tail/2.0.3:
+    dev: false
+    engines:
+      node: '>= 6.0.0'
+    resolution:
+      integrity: sha512-s9NOGkLqqiDEtBttQZI7acLS8ycYK5sTlDwNjGnpXG9c8AWj0cfAtwEIzo/hVRMMiC5EYz+bXaJWC1u1u0GPpQ==
   /throttleit/1.0.0:
     dev: true
     resolution:
@@ -972,7 +984,43 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Soeun64VJfFlqUY99GwoHwePZEhJTAvcYPbcTaH/1pqCVqEfENuUhc8rNJlngNKrVkvZOPRIJ+T8FCKtcu6BXA==
+  github.com/mstrodl/node-minecraft-protocol/390526187abcd8895a324bf1533903e06e89686c:
+    dependencies:
+      buffer-equal: 1.0.0
+      debug: 4.1.1
+      endian-toggle: 0.0.0
+      lodash.get: 4.4.2
+      lodash.merge: 4.6.2
+      minecraft-data: 2.49.0
+      node-rsa: 0.4.2
+      prismarine-nbt: 1.2.1
+      protodef: 1.6.10
+      readable-stream: 3.6.0
+      uuid-1345: 0.99.7
+      yggdrasil: 1.3.0
+    dev: false
+    engines:
+      node: '>=6'
+    name: minecraft-protocol
+    resolution:
+      registry: 'https://registry.npmjs.org/'
+      tarball: 'https://codeload.github.com/mstrodl/node-minecraft-protocol/tar.gz/390526187abcd8895a324bf1533903e06e89686c'
+    version: 1.11.0
+  github.com/prismarinejs/node-minecraft-protocol-forge/b8eda1a6c5e006038cfcc1c808c3691b3c852141:
+    dependencies:
+      protodef: 1.6.10
+    dev: false
+    engines:
+      node: '>=4'
+    name: minecraft-protocol-forge
+    resolution:
+      tarball: 'https://codeload.github.com/prismarinejs/node-minecraft-protocol-forge/tar.gz/b8eda1a6c5e006038cfcc1c808c3691b3c852141'
+    version: 1.0.0
 specifiers:
   debug: ^4.1.1
-  minecraft-protocol: ^1.11.0
+  minecraft-protocol: 'github:mstrodl/node-minecraft-protocol#feature/optvarint'
+  minecraft-protocol-forge: 'github:prismarinejs/node-minecraft-protocol-forge'
+  node-pty: ^0.9.0
   pkg: ^4.4.4
+  protodef: 1.6.10
+  tail: ^2.0.3

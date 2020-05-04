@@ -2,30 +2,52 @@ class IDMap {
   constructor() {
     // Hopefully this is okay...
     this._idCounter = Math.pow(2, 31) - 1;
-    this._proxyIds = {};
-    this._clientIds = {};
+    this._proxyEntities = new Map();
+    this._clientEntities = new Map();
   }
 
   id() {
     const clientId = this._idCounter--;
-    this._clientIds[clientId] = null;
+    this._clientEntities.set(clientId, null);
     return clientId;
   }
 
-  associate(proxyId, clientId) {
-    this._clientIds[clientId] = proxyId;
-    this._proxyIds[proxyId] = clientId;
-
-    return clientId;
+  associate(proxyId, clientId, metadata = null, withMeta = false) {
+    this._clientEntities.set(
+      clientId,
+      Object.assign(
+        {
+          id: proxyId,
+        },
+        metadata
+      )
+    );
+    const clientEntity = Object.assign(
+      {
+        id: clientId,
+      },
+      metadata
+    );
+    this._proxyEntities.set(proxyId, clientEntity);
+    return withMeta ? clientEntity : clientId;
   }
 
-  fromProxyId(proxyId) {
-    const clientId = this._proxyIds[proxyId];
-    return clientId || this.associate(proxyId, this.id());
+  fromProxyId(proxyId, withMeta = false, metadata = null) {
+    const clientEntity = this._proxyEntities.get(proxyId);
+    if (clientEntity === undefined) {
+      return this.associate(proxyId, this.id(), metadata, withMeta);
+    } else {
+      return withMeta ? clientEntity : clientEntity.id;
+    }
   }
 
-  fromClientId(clientId) {
-    return this._clientIds[clientId];
+  fromClientId(clientId, withMeta = false) {
+    const entity = this._clientEntities.get(clientId);
+    if (withMeta) {
+      return entity;
+    } else {
+      return entity.id;
+    }
   }
 }
 

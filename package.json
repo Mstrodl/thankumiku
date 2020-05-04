@@ -10,7 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^4.1.1",
-    "minecraft-protocol": "^1.11.0"
+    "minecraft-protocol": "github:mstrodl/node-minecraft-protocol#feature/optvarint",
+    "minecraft-protocol-forge": "github:prismarinejs/node-minecraft-protocol-forge",
+    "node-pty": "^0.9.0",
+    "protodef": "1.6.10",
+    "tail": "^2.0.3"
   },
   "devDependencies": {
     "pkg": "^4.4.4"
