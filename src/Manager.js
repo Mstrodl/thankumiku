@@ -20,6 +20,7 @@ const ENTITY_PROPS = [
   "collectedEntityId",
   "collectorEntityId",
   "target",
+  "vehicleId",
 ];
 const ENTITY_ARRAY_PROPS = ["entityIds", "passengers"];
 
