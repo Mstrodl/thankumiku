@@ -1,12 +1,12 @@
-const { EventEmitter } = require("events");
+const {EventEmitter} = require("events");
 const child_process = require("child_process");
 const NMP = require("minecraft-protocol");
 const IDMap = require("./IDMap");
 const fs = require("fs-extra");
 const path = require("path");
 let pty = null;
-const { autoVersionForge } = require("minecraft-protocol-forge");
-const { Tail } = require("tail");
+const {autoVersionForge} = require("minecraft-protocol-forge");
+const {Tail} = require("tail");
 
 function ensurePty() {
   if (pty) return pty;
@@ -70,6 +70,13 @@ class Manager extends EventEmitter {
 
     this.entityTypes = {
       firework_rocket: 27,
+      fishing_float: 102,
+      dragon_fireball: 15,
+      fireball: 37,
+      small_fireball: 69,
+      spectral_arrow: 72,
+      arrow: 2,
+      wither_skull: 93,
     };
   }
 
@@ -529,10 +536,9 @@ class Manager extends EventEmitter {
         for (const entityMetadata of data.metadata) {
           // Entity ID of entity which used firework (for elytra boosting)
           if (entityMetadata.key == 8 && entityMetadata.type == 17) {
-            if (entityMetadata.value !== undefined) {
-              entityMetadata.value = this.entities.fromProxyId(
-                entityMetadata.value
-              );
+            if (entityMetadata.value !== 0) {
+              entityMetadata.value =
+                this.entities.fromProxyId(entityMetadata.value - 1) + 1;
             }
           }
         }
@@ -541,6 +547,21 @@ class Manager extends EventEmitter {
       data.entityId = this.entities.fromProxyId(data.entityId, false, {
         type: data.type,
       });
+      // Owner of the fishing float
+      if (
+        data.type == this.entityTypes.fishing_float ||
+        data.type == this.entityTypes.fireball ||
+        data.type == this.entityTypes.small_fireball ||
+        data.type == this.entityTypes.dragon_fireball ||
+        data.type == this.entityTypes.wither_skull
+      ) {
+        data.objectData = this.entities.fromProxyId(data.objectData);
+      } else if (
+        data.type == this.entityTypes.arrow ||
+        data.type == this.entityTypes.spectral_arrow
+      ) {
+        data.objectData = this.entities.fromProxyId(data.objectData - 1) + 1;
+      }
     } else {
       for (const id of ENTITY_PROPS) {
         if (data[id]) {
